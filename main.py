@@ -28,6 +28,15 @@ class Window(Frame):
 
 
     def Home(self, Master = None):
+        try:
+            os.remove('smart_open.txt')
+        except:
+            print("NO such file found")
+
+        with open("smart_open.txt", "w") as myfile:
+            myfile.write("SMART_OPEN=0")
+            myfile.close()
+
         self.c.create_image(0, 0, image = self.bg_image, anchor=NW)
         self.transparentImageButton = Button(self, text="Remove background ", height = "2",width = "16",bd = 0,wraplength = "200",fg = "white",activeforeground="white",bg = "#6699ff",activebackground='#6699ff',command=self.bgRemove)
         self.transparentImageButton.place(x=200, y=120)
@@ -41,7 +50,10 @@ class Window(Frame):
         print("hello")
 
     def smartKeys(self, master = None):
-        print("smartkeys")
+        with open("smart_open.txt", "w") as myfile:
+            myfile.write("SMART_OPEN=1")
+            myfile.close()
+
         self.transparentImageButton.destroy()
         self.smartKeyButton.destroy()
         self.c.delete('all')
@@ -103,6 +115,7 @@ class Window(Frame):
             for i in range(0, 6):
                 data = self.shiftButton[i].cget('text') + "=" + self.smartFileopenButton[i].cget('text') + "\n"
                 myfile.write(data)
+
             myfile.close()
 
     def on_configure(self,event):
@@ -165,7 +178,15 @@ class Window(Frame):
             myfile.close()
 
     def smart_back(self):
-        print("back")
+
+        try:
+            os.remove('smart_open.txt')
+        except:
+            print("NO such file found")
+
+        with open("smart_open.txt", "w") as myfile:
+            myfile.write("SMART_OPEN=0")
+            myfile.close()
         self.c.delete('all')
         self.smart_backButton.destroy()
         self.Home()
@@ -180,7 +201,7 @@ def func1():
     root.mainloop()
 
 def func2():
-    #os.system('keylogger.py')
+    os.system('keylogger.py')
     print("hello")
 
 if __name__ == '__main__':
