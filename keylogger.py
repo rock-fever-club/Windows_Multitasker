@@ -1,8 +1,8 @@
 from pynput.keyboard import Key, Listener
 import subprocess
-
-isShiftPressed = False
+isAltPressed = False
 def on_press(key):
+    global isAltPressed
     try:
         keyPressed = '{0}'.format(key.char)
         with open('smart_open.txt', 'r') as myfile:
@@ -16,13 +16,7 @@ def on_press(key):
             for line in myfile:
                 data = line.split("=")
                 keySupposed = data[0]
-                if keySupposed != "" and keySupposed != "SMART_OPEN":
-                    k = ord(keySupposed[0])
-                    if k > 95:
-                        k = k - 32
-                    elif k < 92:
-                        k = k + 32
-                    keySupposed = str(chr(k))
+                if keySupposed != "" and isAltPressed == True:
                     print(keySupposed, " ", keyPressed)
                     path = data[1].split("\n")[0]
                     path_list = list()
@@ -32,7 +26,13 @@ def on_press(key):
                         subprocess.Popen(path_list)
 
     except:
-        print("special key is pressed")
+        if key == Key.alt_l:
+            isAltPressed = True
 
-with Listener(on_press=on_press) as listener:
+def on_release(key):
+    if key == Key.alt:
+        global isAltPressed
+        isAltPressed = False
+
+with Listener(on_press=on_press,on_release=on_release) as listener:
     listener.join()

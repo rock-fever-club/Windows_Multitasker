@@ -1,6 +1,6 @@
 a=C:/my_data/softwares/arduino-1.8.10/arduino.exe
 =Browse
-c=C:/my_data/softwares/CadSoft Eagle Professional 7.6.0 Multilingual (x64) + Crack [SadeemPC]/Crack/eagle.exe
 =Browse
+d=C:/my_data/softwares/ISO CONVERTERS AND BOOTABLES/rufus-3.6.exe
 =Browse
 =Browse
