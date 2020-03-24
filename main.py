@@ -4,7 +4,9 @@ from PIL import ImageTk,Image
 import tkinter.font as font
 from array import *
 from pynput.keyboard import Key, Listener
-import logging
+import os
+from multiprocessing import Process
+import pickle
 
 class Window(Frame):
     def __init__(self, master=None):
@@ -13,25 +15,20 @@ class Window(Frame):
         self.currentButtonEngage = -1
         self.master.bind_all('<Key>', self.key)
 
-        if self.currentButtonEngage == -1:
-            with Listener(on_press=self.on_press) as listener:
-                listener.join()
-
         #widgets can take whole window
         self.pack(fill=BOTH, expand=1)
         self.w, self.h = self.master.winfo_screenwidth(), self.master.winfo_screenheight()
         self.master.geometry("%dx%d" % (self.w, self.h))
-        self.Home()
-
-    def Home(self, Master = None):
-        self.c = Canvas(self, bg="#1f1f1f", height=self.h, width=self.w)
-        self.c.pack(expand=YES, fill=BOTH)
         self.image =Image.open('C:\\my_data\\robotics\\Windows_Multitasker\\assets\\main_bg.jpg')
         self.image = self.image.resize((self.w,self.h ))
         self.bg_image = ImageTk.PhotoImage(self.image)
+        self.c = Canvas(self, bg="#1f1f1f", height=self.h, width=self.w)
+        self.c.pack(expand=YES, fill=BOTH)
+        self.Home()
 
+
+    def Home(self, Master = None):
         self.c.create_image(0, 0, image = self.bg_image, anchor=NW)
-
         self.transparentImageButton = Button(self, text="Remove background ", height = "2",width = "16",bd = 0,wraplength = "200",fg = "white",activeforeground="white",bg = "#6699ff",activebackground='#6699ff',command=self.bgRemove)
         self.transparentImageButton.place(x=200, y=120)
         self.transparentImageButton['font'] = font.Font(size = 14)
@@ -51,15 +48,10 @@ class Window(Frame):
 
         self.image =Image.open('C:\\my_data\\robotics\\Windows_Multitasker\\assets\\smart_bg.jpg')
         self.image = self.image.resize((self.w,self.h ))
-        self.bg_image = ImageTk.PhotoImage(self.image)
-        self.c.create_image(0, 0, image = self.bg_image, anchor=NW)
-
-        '''self.scrollbar = Scrollbar(self, command=self.c.yview)
-        self.scrollbar.pack(side=RIGHT, fill='y')
-
-        self.c.configure(yscrollcommand = self.scrollbar.set)
-
-        self.c.bind('<Configure>', self.on_configure)'''
+        self.smart_bg_image = ImageTk.PhotoImage(self.image)
+        self.c.create_image(0, 0, image = self.smart_bg_image, anchor=NW)
+        self.smart_backButton = Button(self, text = "Back", width = 10,font = font.Font(size = 17), bg = "black", fg = "white",command = self.smart_back)
+        self.smart_backButton.place(x = 10, y = 10)
 
         self.smartFrame = Frame(self.c)
         self.smartFrame.bind("<Button-1>",self.smartCheck)
@@ -69,11 +61,23 @@ class Window(Frame):
         self.smartFileopenButton = list()
         self.shiftButtonToggle = [0, 0 ,0 ,0 , 0, 0]
         self.smart_path = ["","","","","","",""]
+        self.smart_key = ["","","","","","",""]
         y1 = 30
+        with open("var.txt", "r") as myfile:
+            i = 0
+            for line in myfile:
+                if i < 6 and line != "\n":
+                    data = line.split("=")
+                    print(data, "    ",i)
+                    self.smart_key[i] = data[0]
+                    self.smart_path[i] = data[1].split('\n')[0]
+                    i = i + 1
+            myfile.close()
+
         for i in range(0, 6):
             self.shiftLabel.append( Label(self.smartFrame, text = "Shift + ",font = font.Font(size = 17), bg = "black", fg = "white"))
-            self.shiftButton.append( Button(self.smartFrame, text = " ", width = 10,font = font.Font(size = 17), bg = "black", fg = "white"))
-            self.smartFileopenButton.append( Button(self.smartFrame, text = "Browse",width = 20,font = font.Font(size = 17), bg = "black", fg = "white"))
+            self.shiftButton.append( Button(self.smartFrame, text = self.smart_key[i], width = 10,font = font.Font(size = 17), bg = "black", fg = "white"))
+            self.smartFileopenButton.append( Button(self.smartFrame, text = self.smart_path[i],width = 20,font = font.Font(size = 17), bg = "black", fg = "white"))
             self.shiftLabel[i].place(x = 30, y = y1 )
             self.shiftButton[i].place(x = 250, y = y1 - 10 )
             self.smartFileopenButton[i].place(x = 500, y = y1 - 10 )
@@ -91,6 +95,15 @@ class Window(Frame):
         self.smartFileopenButton[3].bind("<Button-1>", lambda event,a = 3:self.smart_browseFunction(a))
         self.smartFileopenButton[4].bind("<Button-1>", lambda event,a = 4:self.smart_browseFunction(a))
         self.smartFileopenButton[5].bind("<Button-1>", lambda event,a = 5:self.smart_browseFunction(a))
+        try:
+            os.remove('var.txt')
+        except:
+            print('file do not exist')
+        with open("var.txt", "w") as myfile:
+            for i in range(0, 6):
+                data = self.shiftButton[i].cget('text') + "=" + self.smartFileopenButton[i].cget('text') + "\n"
+                myfile.write(data)
+            myfile.close()
 
     def on_configure(self,event):
     # update scrollregion after starting 'mainloop'
@@ -113,6 +126,15 @@ class Window(Frame):
         if filename != "":
             self.smart_path[a] = filename
             self.smartFileopenButton[a].config(text = self.smart_path[a], height = 2,width = 29,font = font.Font(size = 12))
+        try:
+            os.remove('var.txt')
+        except:
+            print('file do not exist')
+        with open("var.txt", "w") as myfile:
+            for i in range(0, 6):
+                data = self.shiftButton[i].cget('text') + "=" + self.smartFileopenButton[i].cget('text') + "\n"
+                myfile.write(data)
+            myfile.close()
 
     def smartCheck(self, event):
         print(self.currentButtonEngage)
@@ -128,20 +150,43 @@ class Window(Frame):
         if(self.currentButtonEngage != -1):
             if event.keysym != "Escape":
                 self.shiftButton[self.currentButtonEngage].config(text = event.keysym)
+
             else:
                 self.shiftButton[self.currentButtonEngage].config(text = "")
                 self.smartFileopenButton[self.currentButtonEngage].config(text = "Browse", height = 1,width = 20,font = font.Font(size = 17))
+        try:
+            os.remove('var.txt')
+        except:
+            print('file do not exist')
+        with open("var.txt", "w") as myfile:
+            for i in range(0, 6):
+                data = self.shiftButton[i].cget('text') + "=" + self.smartFileopenButton[i].cget('text') + "\n"
+                myfile.write(data)
+            myfile.close()
 
-    def on_press(self, key):
-        self.currentButtonEngage += 1
-        print(self.currentButtonEngage)
+    def smart_back(self):
+        print("back")
+        self.c.delete('all')
+        self.smart_backButton.destroy()
+        self.Home()
 
-# initialize tkinter
-root = Tk()
-app = Window(root)
+def func1():
+    # initialize tkinter
+    root = Tk()
+    app = Window(root)
 
-# set window title
-root.wm_title("Ismart Rock")
+    root.wm_title("Ismart Rock")
+    # show window
+    root.mainloop()
 
-# show window
-root.mainloop()
+def func2():
+    #os.system('keylogger.py')
+    print("hello")
+
+if __name__ == '__main__':
+  p1 = Process(target=func1)
+  p1.start()
+  p2 = Process(target=func2)
+  p2.start()
+  p1.join()
+  p2.join()
