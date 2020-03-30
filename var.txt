@@ -1,6 +1,6 @@
 a=C:/my_data/softwares/arduino-1.8.10/arduino.exe
+s=C:/Users/AMIT/AppData/Roaming/Spotify/Spotify.exe
 =Browse
-=Browse
-d=C:/my_data/softwares/ISO CONVERTERS AND BOOTABLES/rufus-3.6.exe
+w=C:/Program Files (x86)/Google/Chrome/Application/chrome.exe
 =Browse
 =Browse

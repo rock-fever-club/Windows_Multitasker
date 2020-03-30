@@ -10,6 +10,7 @@ import pickle
 import numpy as np
 import cv2
 from time import sleep
+
 class Window(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
